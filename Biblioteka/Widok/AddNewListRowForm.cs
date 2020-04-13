@@ -10,26 +10,26 @@ namespace Biblioteka
 {
     class AddNewListRowForm: Form
     {
-        private LibraryData data;
-        private Dictionary<RowAttribute, TextBox> textBoxes = new Dictionary<RowAttribute, TextBox>();
+        private readonly DataTable dataTable;
+        private readonly Dictionary<Attribute, TextBox> textBoxes = new Dictionary<Attribute, TextBox>();
 
         readonly private int textLabelLength = 100;
         readonly private int textFieldLength = 150;
         readonly private int rowHeight = 25;
         readonly private int rowGap = 10;
 
-        public AddNewListRowForm(LibraryData data)
+        public AddNewListRowForm(DataTable dataTable)
         {
-            this.data = data;
-            this.Text = data.Name + ": dodaj nowy rekord";
+            this.dataTable = dataTable;
+            Text = dataTable.Name + ": dodaj nowy rekord";
         }
 
         public void Load()
         {
             int i = 0;
-            foreach (var attr in this.data.Attributes) {
+            foreach (var attr in this.dataTable.AttributeRow.Attributes) {
                 Label textLabel = new Label();
-                textLabel.Text = attr.GetAttributeName();
+                textLabel.Text = attr.Name;
                 textLabel.Location = new Point(0, i * (rowHeight + rowGap));
                 textLabel.Size = new Size(textLabelLength, rowHeight);
 
@@ -42,10 +42,10 @@ namespace Biblioteka
 
                 textBox.Validating += (object sender, System.ComponentModel.CancelEventArgs e) =>
                 {
-                    if (!attr.ValidateValue(textBox.Text))
+                    if (!attr.Validate(textBox.Text))
                     {
                         e.Cancel = true;
-                        errorProvider.SetError(textBox, "Nieprawidłowa wartość atrybutu " + attr.GetAttributeName());
+                        errorProvider.SetError(textBox, "Nieprawidłowa wartość atrybutu " + attr.Name);
                     }
                 };
                 textBox.Validated += (object sender, EventArgs e) =>
@@ -70,8 +70,7 @@ namespace Biblioteka
 
         private void Button_Click(object sender, EventArgs e)
         {
-            if (this.ValidateChildren())
-                this.data.addRow(this.textBoxes.Select((pair) => pair.Value.Text).ToArray());
+            // TODO: dodaj
         }
     }
 }

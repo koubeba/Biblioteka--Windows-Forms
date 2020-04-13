@@ -9,21 +9,20 @@ namespace Biblioteka
 {
     class ListForm: Form
     {
-        protected ListRowFactory listRowFactory;
-        protected LibraryData libraryData;
-        private ListView list = new ListView();
+        private readonly DataTable dataTable;
+        private readonly ListView list = new ListView();
 
-        public ListForm(String formName, LibraryData libraryData)
+        public ListForm(DataTable dataTable)
         {
-            this.libraryData = libraryData;
-            this.Text = formName;
-            this.listRowFactory = new ListRowFactory(libraryData.Attributes);
+            this.dataTable = dataTable;
+            this.Text = this.dataTable.Name;
 
             // Dodaj widok listy do kontrolek
-            this.Controls.Add(list);
-            this.list.View = View.Details;
+            Controls.Add(list);
+            list.View = View.Details;
 
-            this.libraryData.NewRowAddedEvent += LibraryData_NewRowAddedEvent;
+            // TODO: dodać delegate
+            // this.libraryData.NewRowAddedEvent += LibraryData_NewRowAddedEvent;
 
             // TODO: check if attributes are a subset of libraryData attributes
 
@@ -39,7 +38,7 @@ namespace Biblioteka
         private void initializeListViewItems()
         {
             int index = 1;
-            foreach (var item in this.libraryData.Rows.ToArray())
+            foreach (var item in this.dataTable.AttributeValueRows)
             {
                 this.list.Items.Add(generateListViewItemForRow(item, index++));
             }
@@ -48,26 +47,26 @@ namespace Biblioteka
             // Kolumna indeksu
             this.list.Columns.Add(String.Empty, -2, HorizontalAlignment.Left);
 
-            foreach (var pair in this.libraryData.GetAttributeData()) this.list.Columns.Add(pair.Item1, -2, HorizontalAlignment.Left);
+            // foreach (var pair in this.libraryData.GetAttributeData()) this.list.Columns.Add(pair.Item1, -2, HorizontalAlignment.Left);
         }
 
-        private ListViewItem generateListViewItemForRow(ListRow row, int index)
+        private ListViewItem generateListViewItemForRow(AttributeValueRow row, int index)
         {
             ListViewItem listViewItem = new ListViewItem(index.ToString());
-            //listViewItem.Text = item.ToString();
-            foreach (var attrString in row.GetAttributeStrings())
+            foreach (AttributeValue val in row.AttributeValues)
             {
-                listViewItem.SubItems.Add(attrString);
+                listViewItem.SubItems.Add(val.ToString());
             }
             return listViewItem;
         }
 
-        private void addNewListViewItem(ListRow newRow)
+        private void addNewListViewItem(AttributeValueRow newRow)
         {
-            this.list.Items.Add(generateListViewItemForRow(newRow, this.list.Items.Count+1));
+            // TODO
+            //this.list.Items.Add(generateListViewItemForRow(newRow, this.list.Items.Count+1));
         }
 
-        private void LibraryData_NewRowAddedEvent(object sender, ListRow newRow)
+        private void LibraryData_NewRowAddedEvent(object sender, AttributeValueRow newRow)
         {
             this.addNewListViewItem(newRow);
         }

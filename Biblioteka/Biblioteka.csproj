@@ -46,26 +46,31 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Model\DataValidation.cs" />
+    <Compile Include="Model\Attribute\AttributeValue.cs" />
+    <Compile Include="Model\Attribute\TypedAttributeValueFactory.cs" />
+    <Compile Include="Model\Data\DataTable.cs" />
+    <Compile Include="Model\Row\AttributeRow.cs" />
+    <Compile Include="Model\Row\AttributeValueRow.cs" />
+    <Compile Include="Model\Row\Row.cs" />
+    <Compile Include="Model\Validation\DataValidation.cs" />
+    <Compile Include="Model\Attribute\TypedAttributeValue.cs" />
+    <Compile Include="Model\Validation\TypedDataValidation.cs" />
     <Compile Include="Widok\AddNewListRowForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Widok\ListFormFactory.cs" />
-    <Compile Include="Model\LibraryData.cs" />
     <Compile Include="Model\LibraryDataRepository.cs" />
     <Compile Include="Widok\ListForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Model\RowAttribute.cs" />
-    <Compile Include="Model\TypedRowAttribute.cs" />
+    <Compile Include="Model\Attribute\Attribute.cs" />
+    <Compile Include="Model\Attribute\TypedAttribute.cs" />
     <Compile Include="Widok\LibraryForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Widok\LibraryForm.Designer.cs">
       <DependentUpon>LibraryForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Model\ListRow.cs" />
-    <Compile Include="Model\ListRowFactory.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Widok\AddNewListRowForm.resx">
@@ -99,5 +104,6 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

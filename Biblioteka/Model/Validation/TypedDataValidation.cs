@@ -6,16 +6,16 @@ using System.Threading.Tasks;
 
 namespace Biblioteka
 {
-    class DataValidation<T>
+    class TypedDataValidation<T>: DataValidation
     {
-        protected Func<T, bool> validationFunction;
+        private readonly Func<T, bool> validationFunction;
 
-        public DataValidation(Func<T, bool> validationFunction)
+        public TypedDataValidation(Func<T, bool> validationFunction)
         {
             this.validationFunction = validationFunction;
         }
 
-        public bool Validate(Object value)
+        public override bool Validate(Object value)
         {
             return value.GetType() == typeof(T) && this.validationFunction((T)value);
         }

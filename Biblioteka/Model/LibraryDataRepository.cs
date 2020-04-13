@@ -6,32 +6,25 @@ using System.Threading.Tasks;
 
 namespace Biblioteka
 {
+    // TODO: singleton
     class LibraryDataRepository
-    {
-        protected Dictionary<String, LibraryData> dataCollections = new Dictionary<String, LibraryData>();
+    { 
+        public Dictionary<String, DataTable> DataCollections { get; }
 
-        public Dictionary<String, LibraryData> GetKeyValuePairs()
+        public LibraryDataRepository()
         {
-            return this.dataCollections;
+            this.DataCollections = new Dictionary<string, DataTable>();
+        }
+        public void AddDataCollection(String name, Attribute[] attributes)
+        {
+            DataCollections.Add(name, new DataTable(name, new AttributeRow(attributes)));
         }
 
-        public Dictionary<String, LibraryData> AddDataCollection(String name, RowAttribute[] attributes)
+        public void AddToCollection(String name, Object[] attributeValues)
         {
-            this.dataCollections.Add(name, new LibraryData(name, attributes));
-            return this.dataCollections;
-        }
-
-        public LibraryData AddToCollection(String name, Object[] attributeValues)
-        {
-            // Sprawdź, czy taki element już istnieje
-            this.dataCollections[name].Rows.Any(row => row.GetHashCode().Equals(attributeValues.GetHashCode()));
-            this.dataCollections[name].addRow(attributeValues);
-            return this.dataCollections[name];
-        }
-
-        public LibraryData GetCollection(String name)
-        {
-            return this.dataCollections[name];
+            // TODO: Sprawdź, czy kolekcja o takiej nazwie istnieje
+            // TODO: Sprawdź, czy taki element już istnieje
+            DataCollections[name].AddValueRow(attributeValues);
         }
     }
 }

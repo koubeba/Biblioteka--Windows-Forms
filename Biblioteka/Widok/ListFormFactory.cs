@@ -9,24 +9,21 @@ namespace Biblioteka
 {
     class ListFormFactory
     {
-        private String formName;
-        private RowAttribute[] attributes { get; }
-        private LibraryData libraryData { get; }
+        private DataTable dataTable;
 
-        public ListFormFactory(LibraryData libraryData, string formName)
+        public ListFormFactory(DataTable dataTable)
         {
-            this.libraryData = libraryData;
-            this.formName = formName;
+            this.dataTable = dataTable;
         }
 
         public String GetFormName()
         {
-            return this.formName;
+            return this.dataTable.Name;
         }
 
         public ListForm CreateForm()
         {
-            return new ListForm(this.formName, this.libraryData);
+            return new ListForm(this.dataTable);
         }
     }
 }

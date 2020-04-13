@@ -14,24 +14,24 @@ namespace Biblioteka
     {
 
         private List<ListFormFactory> availableChildrenForms;
-        private LibraryDataRepository repository = new LibraryDataRepository();
+        private readonly LibraryDataRepository repository = new LibraryDataRepository();
 
-        private DataValidation<String> basicStringValidation = new DataValidation<String>((String newVal) => { return newVal.IsNormalized() && newVal.Length != 0; });
+        private readonly TypedDataValidation<String> basicStringValidation = new TypedDataValidation<String>((String newVal) => { return newVal.IsNormalized() && newVal.Length != 0; });
 
         public LibraryForm()
         {
             InitializeComponent();
             this.IsMdiContainer = true;
-            this.repository.AddDataCollection("Autorzy", new RowAttribute[] { 
-                new TypedRowAttribute<String>("Imię", basicStringValidation), 
-                new TypedRowAttribute<String>("Nazwisko", basicStringValidation) 
+            this.repository.AddDataCollection("Autorzy", new Attribute[] { 
+                new TypedAttribute<String>("Imię", basicStringValidation), 
+                new TypedAttribute<String>("Nazwisko", basicStringValidation) 
             });
             this.repository.AddToCollection("Autorzy", new String[] { "Ursula", "Le Guin" });
             this.repository.AddToCollection("Autorzy", new String[] { "Fumiko", "Enchi" });
 
-            this.repository.AddDataCollection("Książki", new RowAttribute[] { 
-                new TypedRowAttribute<String>("Tytuł", basicStringValidation), 
-                new TypedRowAttribute<String>("Rok wydania", basicStringValidation) 
+            this.repository.AddDataCollection("Książki", new Attribute[] { 
+                new TypedAttribute<String>("Tytuł", basicStringValidation), 
+                new TypedAttribute<String>("Rok wydania", basicStringValidation) 
             });
             this.repository.AddToCollection("Książki", new String[] { "Maski", "1958" });
         }
@@ -39,9 +39,9 @@ namespace Biblioteka
         private void initializeChildrenForms()
         {
             this.availableChildrenForms = new List<ListFormFactory>();
-            foreach (var pair in this.repository.GetKeyValuePairs())
+            foreach (KeyValuePair<string, DataTable> pair in this.repository.DataCollections)
             {
-                this.availableChildrenForms.Add(new ListFormFactory(pair.Value, pair.Key));
+                this.availableChildrenForms.Add(new ListFormFactory(pair.Value));
             }
             
             this.availableChildrenForms.ForEach(
@@ -51,8 +51,8 @@ namespace Biblioteka
 
         private void initializeAddRowOptions()
         {
-            this.dodajRekordToolStripMenuItem.DropDownItems.AddRange(this.repository.GetKeyValuePairs()
-                .Select(pair => createAddRowOptionForCollectionRow(pair.Key, pair.Value)).ToArray());
+            this.dodajRekordToolStripMenuItem.DropDownItems.AddRange(this.repository.DataCollections
+                .Select(pair => createAddRowOptionForCollectionRow(pair.Value)).ToArray());
         }
 
         private void addChildrenViewOption(ListFormFactory newFormOption)
@@ -61,9 +61,9 @@ namespace Biblioteka
             dodajWidokToolStripMenuItem.DropDownItems.Add(createMenuItemOptionForForm(newFormOption));
         }
 
-        private ToolStripMenuItem createAddRowOptionForCollectionRow(String collectionName, LibraryData collection)
+        private ToolStripMenuItem createAddRowOptionForCollectionRow(DataTable collection)
         {
-            return new ToolStripMenuItem(collectionName, null, (object sender, EventArgs e) => {
+            return new ToolStripMenuItem(collection.Name, null, (object sender, EventArgs e) => {
                 AddNewListRowForm newDialog = new AddNewListRowForm(collection);
                 newDialog.Load();
                 newDialog.MdiParent = this;
