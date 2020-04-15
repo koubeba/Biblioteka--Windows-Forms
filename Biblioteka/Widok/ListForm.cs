@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
+using System.Windows.Forms.VisualStyles;
 using Biblioteka.Widok;
 
 namespace Biblioteka
@@ -32,6 +33,17 @@ namespace Biblioteka
             list.GridLines = true;
             list.MouseClick += List_MouseClick;
 
+            this.FormClosing += ListForm_FormClosing;
+
+        }
+
+        private void ListForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (e.CloseReason == CloseReason.UserClosing)
+            {
+                if (MdiParent.MdiChildren.Length == 1) e.Cancel = true;
+                else e.Cancel = false;
+            }
         }
 
         private void initializeListViewItems()
