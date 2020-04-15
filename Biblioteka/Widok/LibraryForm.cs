@@ -61,7 +61,7 @@ namespace Biblioteka
             this.availableChildrenForms = new List<ListFormFactory>();
             foreach (KeyValuePair<string, DataTable> pair in this.repository.DataCollections)
             {
-                this.availableChildrenForms.Add(new ListFormFactory(pair.Value));
+                this.availableChildrenForms.Add(new ListFormFactory(pair.Value, ElementsCount));
             }
 
             this.availableChildrenForms.ForEach(
@@ -107,6 +107,5 @@ namespace Biblioteka
             this.initializeChildrenForms();
             this.initializeAddRowOptions();
         }
-
     }
 }

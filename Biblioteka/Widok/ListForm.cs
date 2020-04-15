@@ -8,12 +8,15 @@ namespace Biblioteka
     class ListForm : Form
     {
         private readonly DataTable dataTable;
+        private readonly ToolStripStatusLabel statusStrip;
         private readonly ListView list = new ListView();
 
-        public ListForm(DataTable dataTable)
+        public ListForm(DataTable dataTable, ToolStripStatusLabel statusStrip)
         {
             this.dataTable = dataTable;
-            this.Text = this.dataTable.Name;
+            Text = this.dataTable.Name;
+
+            this.statusStrip = statusStrip;
 
             // Dodaj widok listy do kontrolek
             Controls.Add(list);
@@ -22,8 +25,6 @@ namespace Biblioteka
             this.dataTable.NewRowAddedEvent += LibraryData_NewRowAddedEvent;
             this.dataTable.RowDeletedEvent += DataTableOnRowDeletedEvent;
             this.dataTable.RowEditedEvent += DataTable_RowEditedEvent;
-
-                // TODO: check if attributes are a subset of libraryData attributes
 
             // Dodaj elementy kolekcji do listy
             this.initializeListViewItems();
@@ -34,7 +35,12 @@ namespace Biblioteka
             list.MouseClick += List_MouseClick;
 
             this.FormClosing += ListForm_FormClosing;
+            list.GotFocus += List_GotFocus;
+        }
 
+        private void List_GotFocus(object sender, EventArgs e)
+        {
+            UpdateToolstripStatus();
         }
 
         private void ListForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -59,6 +65,7 @@ namespace Biblioteka
             this.list.Columns.Add(String.Empty, -2, HorizontalAlignment.Left);
 
             foreach (Attribute attribute in this.dataTable.AttributeRow.Attributes) this.list.Columns.Add(attribute.Name, -2, HorizontalAlignment.Left);
+            UpdateToolstripStatus();
         }
 
         private ListViewItem generateListViewItemForRow(AttributeValueRow row, int index)
@@ -100,18 +107,19 @@ namespace Biblioteka
 
         private void addNewListViewItem(AttributeValueRow newRow)
         {
-            // TODO
             this.list.Items.Add(generateListViewItemForRow(newRow, this.list.Items.Count+1));
         }
 
         private void LibraryData_NewRowAddedEvent(object sender, AttributeValueRow newRow)
         {
             this.addNewListViewItem(newRow);
+            UpdateToolstripStatus();
         }
 
         private void DataTableOnRowDeletedEvent(object sender, int deletedrowindex)
         {
             list.Items.RemoveAt(deletedrowindex);
+            UpdateToolstripStatus();
         }
 
         private void DataTable_RowEditedEvent(object sender, int editedRowIndex)
@@ -119,6 +127,11 @@ namespace Biblioteka
             list.Items.RemoveAt(editedRowIndex);
             list.Items.Insert(editedRowIndex,
                 generateListViewItemForRow(dataTable.AttributeValueRows[editedRowIndex], editedRowIndex + 1));
+        }
+
+        private void UpdateToolstripStatus()
+        {
+            statusStrip.Text = "Liczba elementów: " + dataTable.AttributeValueRows.Count.ToString();
         }
     }
 }

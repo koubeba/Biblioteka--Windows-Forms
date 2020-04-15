@@ -78,10 +78,5 @@ namespace Biblioteka
         {
             this.dataTable.AddValueRowFromString(textBoxes.Select(o => o.Value.Text).ToArray());
         }
-
-        private void AddNewListRowForm_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            Console.WriteLine("Closing");
-        }
     }
 }
