@@ -14,8 +14,13 @@ namespace Biblioteka
         public List<AttributeValueRow> AttributeValueRows { get; }
 
         public delegate void NewRowAddedDelegate(object sender, AttributeValueRow addedRow);
-
         public event NewRowAddedDelegate NewRowAddedEvent;
+
+        public delegate void RowDeletedDelegate(object sender, int deletedRowIndex);
+        public event RowDeletedDelegate RowDeletedEvent;
+
+        public delegate void RowEditedDelegate(object sender, int editedRowIndex);
+        public event RowEditedDelegate RowEditedEvent;
 
         public DataTable(string name, AttributeRow attributeRow)
         {
@@ -53,6 +58,31 @@ namespace Biblioteka
             return null;
         }
 
+        public void EditValueRowFromString(int editedIndex, string[] values)
+        {
+            if (AttributeRow.ValidateString(values))
+            {
+                try
+                {
+                    AttributeValue[] newValues = AttributeRow.Attributes.ToList().Select(
+                        (Attribute attribute, int index) =>
+                        {
+                            return typeof(TypedAttributeValueFactory)
+                                .GetMethod("GetAttributeValue", BindingFlags.Public | BindingFlags.Static)
+                                .MakeGenericMethod(attribute.Type)
+                                .Invoke(null, new object[] { values[index] });
+                        }).OfType<AttributeValue>().ToArray();
+
+                    AttributeValueRows[editedIndex].SetNewValues(newValues);
+                    RowEditedEvent?.Invoke(this, editedIndex);
+                }
+                catch (NullReferenceException e)
+                {
+                    // TODO: obsłużyć jakoś wyjątek
+                }
+            }
+        }
+
         public AttributeValueRow AddValueRow(Object[] values)
         {
             //if (AttributeRow.Validate(values))
@@ -79,6 +109,12 @@ namespace Biblioteka
                 }
             //}
             //return null;
+        }
+
+        public void DeleteValueRow(int rowIndex)
+        {
+            AttributeValueRows.RemoveAt(rowIndex);
+            RowDeletedEvent?.Invoke(this, rowIndex);
         }
     }
 }

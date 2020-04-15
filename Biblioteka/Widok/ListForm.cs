@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
+using Biblioteka.Widok;
 
 namespace Biblioteka
 {
@@ -17,10 +18,11 @@ namespace Biblioteka
             Controls.Add(list);
             list.View = View.Details;
 
-            // TODO: dodać delegate
             this.dataTable.NewRowAddedEvent += LibraryData_NewRowAddedEvent;
+            this.dataTable.RowDeletedEvent += DataTableOnRowDeletedEvent;
+            this.dataTable.RowEditedEvent += DataTable_RowEditedEvent;
 
-            // TODO: check if attributes are a subset of libraryData attributes
+                // TODO: check if attributes are a subset of libraryData attributes
 
             // Dodaj elementy kolekcji do listy
             this.initializeListViewItems();
@@ -28,6 +30,7 @@ namespace Biblioteka
             list.SetBounds(0, 0, this.Size.Width, this.Size.Height);
 
             list.GridLines = true;
+            list.MouseClick += List_MouseClick;
 
         }
 
@@ -56,6 +59,33 @@ namespace Biblioteka
             return listViewItem;
         }
 
+        private void List_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                if (list.FocusedItem.Bounds.Contains(e.Location))
+                {
+                    ListItemContextMenu menu = new ListItemContextMenu(list.FocusedItem);
+                    menu.RowEditedEvent += RowEditedEvent;
+                    menu.RowDeletedEvent += RowDeletedEvent;
+                    menu.Show(Cursor.Position);
+                }
+            }
+        }
+
+        private void RowDeletedEvent(object sender, ListViewItem item)
+        {
+            dataTable.DeleteValueRow(item.Index);
+        }
+
+        private void RowEditedEvent(object sender, ListViewItem item)
+        {
+            EditListRowForm editForm = new EditListRowForm(dataTable, item.Index);
+            editForm.Load();
+            editForm.MdiParent = this.MdiParent;
+            editForm.Show();
+        }
+
         private void addNewListViewItem(AttributeValueRow newRow)
         {
             // TODO
@@ -65,6 +95,18 @@ namespace Biblioteka
         private void LibraryData_NewRowAddedEvent(object sender, AttributeValueRow newRow)
         {
             this.addNewListViewItem(newRow);
+        }
+
+        private void DataTableOnRowDeletedEvent(object sender, int deletedrowindex)
+        {
+            list.Items.RemoveAt(deletedrowindex);
+        }
+
+        private void DataTable_RowEditedEvent(object sender, int editedRowIndex)
+        {
+            list.Items.RemoveAt(editedRowIndex);
+            list.Items.Insert(editedRowIndex,
+                generateListViewItemForRow(dataTable.AttributeValueRows[editedRowIndex], editedRowIndex + 1));
         }
     }
 }

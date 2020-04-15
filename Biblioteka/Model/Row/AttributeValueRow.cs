@@ -1,4 +1,6 @@
-﻿namespace Biblioteka
+﻿using System.Security.Permissions;
+
+namespace Biblioteka
 {
     class AttributeValueRow : Row<AttributeValue>
     {
@@ -7,6 +9,11 @@
         public AttributeValueRow(AttributeValue[] attributeValues)
         {
             values = attributeValues;
+        }
+
+        public void SetNewValues(AttributeValue[] newAttributeValues)
+        {
+            values = newAttributeValues;
         }
     }
 }

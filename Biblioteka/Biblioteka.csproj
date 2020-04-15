@@ -59,6 +59,9 @@
     <Compile Include="Model\Validation\DataValidation.cs" />
     <Compile Include="Model\Attribute\TypedAttributeValue.cs" />
     <Compile Include="Model\Validation\TypedDataValidation.cs" />
+    <Compile Include="Widok\EditListRowForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Widok\AddNewListRowForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -77,6 +80,12 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Widok\ListItemContextMenu.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <EmbeddedResource Include="Widok\EditListRowForm.resx">
+      <DependentUpon>EditListRowForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Widok\AddNewListRowForm.resx">
       <DependentUpon>AddNewListRowForm.cs</DependentUpon>
     </EmbeddedResource>
