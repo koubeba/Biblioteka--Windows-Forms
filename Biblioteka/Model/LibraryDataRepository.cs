@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Biblioteka
 {
     // TODO: singleton
     class LibraryDataRepository
-    { 
+    {
         public Dictionary<String, DataTable> DataCollections { get; }
 
         public LibraryDataRepository()

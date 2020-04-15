@@ -1,23 +1,26 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Biblioteka.Model.Attribute.Type;
 
 namespace Biblioteka
 {
-    class TypedDataValidation<T>: DataValidation
+    class TypedDataValidation<T> : DataValidation where T: AttributeType
     {
         private readonly Func<T, bool> validationFunction;
-
-        public TypedDataValidation(Func<T, bool> validationFunction)
+        private readonly Func<String, bool> stringValidationFunction;
+        public TypedDataValidation(Func<T, bool> validationFunction, Func<String, bool> stringValidationFunction)
         {
             this.validationFunction = validationFunction;
+            this.stringValidationFunction = stringValidationFunction;
+        }
+
+        public override bool ValidateString(string value)
+        {
+            return stringValidationFunction(value);
         }
 
         public override bool Validate(Object value)
         {
-            return value.GetType() == typeof(T) && this.validationFunction((T)value);
+            return value is T convertedValue && validationFunction(convertedValue);
         }
     }
 }

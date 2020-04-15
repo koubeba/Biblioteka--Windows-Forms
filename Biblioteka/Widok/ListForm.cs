@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Biblioteka
 {
-    class ListForm: Form
+    class ListForm : Form
     {
         private readonly DataTable dataTable;
         private readonly ListView list = new ListView();
@@ -22,7 +18,7 @@ namespace Biblioteka
             list.View = View.Details;
 
             // TODO: dodać delegate
-            // this.libraryData.NewRowAddedEvent += LibraryData_NewRowAddedEvent;
+            this.dataTable.NewRowAddedEvent += LibraryData_NewRowAddedEvent;
 
             // TODO: check if attributes are a subset of libraryData attributes
 
@@ -32,22 +28,22 @@ namespace Biblioteka
             list.SetBounds(0, 0, this.Size.Width, this.Size.Height);
 
             list.GridLines = true;
-            
+
         }
 
         private void initializeListViewItems()
         {
             int index = 1;
-            foreach (var item in this.dataTable.AttributeValueRows)
+            foreach (AttributeValueRow row in this.dataTable.AttributeValueRows)
             {
-                this.list.Items.Add(generateListViewItemForRow(item, index++));
+                this.list.Items.Add(generateListViewItemForRow(row, index++));
             }
 
             // Dodaj kolumny do widoku listy
             // Kolumna indeksu
             this.list.Columns.Add(String.Empty, -2, HorizontalAlignment.Left);
 
-            // foreach (var pair in this.libraryData.GetAttributeData()) this.list.Columns.Add(pair.Item1, -2, HorizontalAlignment.Left);
+            foreach (Attribute attribute in this.dataTable.AttributeRow.Attributes) this.list.Columns.Add(attribute.Name, -2, HorizontalAlignment.Left);
         }
 
         private ListViewItem generateListViewItemForRow(AttributeValueRow row, int index)
@@ -63,7 +59,7 @@ namespace Biblioteka
         private void addNewListViewItem(AttributeValueRow newRow)
         {
             // TODO
-            //this.list.Items.Add(generateListViewItemForRow(newRow, this.list.Items.Count+1));
+            this.list.Items.Add(generateListViewItemForRow(newRow, this.list.Items.Count+1));
         }
 
         private void LibraryData_NewRowAddedEvent(object sender, AttributeValueRow newRow)

@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using System.Drawing;
+using System.Linq;
+using System.Windows.Forms;
 
 namespace Biblioteka
 {
-    class AddNewListRowForm: Form
+    class AddNewListRowForm : Form
     {
         private readonly DataTable dataTable;
         private readonly Dictionary<Attribute, TextBox> textBoxes = new Dictionary<Attribute, TextBox>();
@@ -27,7 +25,8 @@ namespace Biblioteka
         public void Load()
         {
             int i = 0;
-            foreach (var attr in this.dataTable.AttributeRow.Attributes) {
+            foreach (var attr in this.dataTable.AttributeRow.Attributes)
+            {
                 Label textLabel = new Label();
                 textLabel.Text = attr.Name;
                 textLabel.Location = new Point(0, i * (rowHeight + rowGap));
@@ -42,7 +41,7 @@ namespace Biblioteka
 
                 textBox.Validating += (object sender, System.ComponentModel.CancelEventArgs e) =>
                 {
-                    if (!attr.Validate(textBox.Text))
+                    if (!attr.DataValidation.ValidateString(textBox.Text))
                     {
                         e.Cancel = true;
                         errorProvider.SetError(textBox, "Nieprawidłowa wartość atrybutu " + attr.Name);
@@ -70,7 +69,7 @@ namespace Biblioteka
 
         private void Button_Click(object sender, EventArgs e)
         {
-            // TODO: dodaj
+            this.dataTable.AddValueRowFromString(textBoxes.Select(o => o.Value.Text).ToArray());
         }
     }
 }

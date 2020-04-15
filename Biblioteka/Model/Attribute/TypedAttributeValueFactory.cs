@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Biblioteka.Model.Attribute.Type;
 
 namespace Biblioteka
 {
     static class TypedAttributeValueFactory
     {
-        public static TypedAttributeValue<T> GetAttributeValue<T>(T value) where T: ICloneable
+        public static TypedAttributeValue<T> GetAttributeValue<T>(object value) where T : AttributeType
         {
             return new TypedAttributeValue<T>(value);
         }

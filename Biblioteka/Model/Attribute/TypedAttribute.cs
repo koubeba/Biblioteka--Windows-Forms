@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Biblioteka.Model.Attribute.Type;
 
 namespace Biblioteka
 {
-    class TypedAttribute<T>: Attribute where T: ICloneable
+    class TypedAttribute<T> : Attribute where T : AttributeType
     {
         public new string Name => base.Name;
 
@@ -20,7 +17,7 @@ namespace Biblioteka
         }
         public override bool Equals(object obj)
         {
-            return obj != null && 
+            return obj != null &&
                    this.Type == obj.GetType() &&
                    this.EqualsAttribute((TypedAttribute<T>)obj);
         }

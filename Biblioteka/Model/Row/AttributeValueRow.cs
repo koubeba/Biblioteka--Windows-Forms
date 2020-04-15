@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Biblioteka
+﻿namespace Biblioteka
 {
-    class AttributeValueRow: Row<AttributeValue>
+    class AttributeValueRow : Row<AttributeValue>
     {
-        public AttributeValue[] AttributeValues => base.values;
+        public AttributeValue[] AttributeValues => values;
 
         public AttributeValueRow(AttributeValue[] attributeValues)
         {
-            base.values = attributeValues;
+            values = attributeValues;
         }
     }
 }

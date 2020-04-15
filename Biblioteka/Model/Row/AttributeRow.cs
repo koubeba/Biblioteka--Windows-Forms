@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+using System.Windows.Forms.VisualStyles;
 
 namespace Biblioteka
 {
-    class AttributeRow: Row<Attribute>
+    class AttributeRow : Row<Attribute>
     {
         public Attribute[] Attributes => base.values;
 
@@ -16,14 +12,32 @@ namespace Biblioteka
             base.values = attributes;
         }
 
+        // TODO: rewrite using delegates
+
         public bool Validate(Object[] values)
         {
             if (Attributes.Length == values.Length)
             {
                 int index = 0;
-                foreach (Attribute attr in Attributes)
+                while (index<Attributes.Length)
                 {
-                    if (!attr.Validate(values[index])) return false;
+                    if (!Attributes[index].Validate(values[index])) return false;
+                    index++;
+                }
+                return true;
+            }
+            return false;
+        }
+
+        public bool ValidateString(string[] values)
+        {
+            if (Attributes.Length == values.Length)
+            {
+                int index = 0;
+                while (index < Attributes.Length)
+                {
+                    if (!Attributes[index].ValidateString(values[index])) return false;
+                    index++;
                 }
                 return true;
             }

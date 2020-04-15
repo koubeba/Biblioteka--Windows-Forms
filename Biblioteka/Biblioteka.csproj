@@ -48,6 +48,10 @@
   <ItemGroup>
     <Compile Include="Model\Attribute\AttributeValue.cs" />
     <Compile Include="Model\Attribute\TypedAttributeValueFactory.cs" />
+    <Compile Include="Model\Attribute\Type\AttributeGenericType.cs" />
+    <Compile Include="Model\Attribute\Type\AttributeType.cs" />
+    <Compile Include="Model\Attribute\Type\IntAttributeType.cs" />
+    <Compile Include="Model\Attribute\Type\StringAttributeType.cs" />
     <Compile Include="Model\Data\DataTable.cs" />
     <Compile Include="Model\Row\AttributeRow.cs" />
     <Compile Include="Model\Row\AttributeValueRow.cs" />
