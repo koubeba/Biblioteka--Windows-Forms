@@ -61,7 +61,7 @@ namespace Biblioteka
             this.availableChildrenForms = new List<ListFormFactory>();
             foreach (KeyValuePair<string, DataTable> pair in this.repository.DataCollections)
             {
-                this.availableChildrenForms.Add(new ListFormFactory(pair.Value, ElementsCount));
+                this.availableChildrenForms.Add(new ListFormFactory(pair.Value, ElementsCount, MainMenuStrip));
             }
 
             this.availableChildrenForms.ForEach(
@@ -86,8 +86,8 @@ namespace Biblioteka
             return new ToolStripMenuItem(collection.Name, null, (object sender, EventArgs e) =>
             {
                 AddNewListRowForm newDialog = new AddNewListRowForm(collection);
-                newDialog.Load();
                 newDialog.MdiParent = this;
+                newDialog.Load();
                 newDialog.Show();
             });
         }

@@ -7,11 +7,13 @@ namespace Biblioteka
     {
         private readonly DataTable dataTable;
         private readonly ToolStripStatusLabel statusLabel;
+        private readonly MenuStrip menuStrip;
 
-        public ListFormFactory(DataTable dataTable, ToolStripStatusLabel statusLabel)
+        public ListFormFactory(DataTable dataTable, ToolStripStatusLabel statusLabel, MenuStrip menuStrip)
         {
             this.dataTable = dataTable;
             this.statusLabel = statusLabel;
+            this.menuStrip = menuStrip;
         }
 
         public String GetFormName()
@@ -21,7 +23,7 @@ namespace Biblioteka
 
         public ListForm CreateForm()
         {
-            return new ListForm(this.dataTable, this.statusLabel);
+            return new ListForm(this.dataTable, this.statusLabel, this.menuStrip);
         }
     }
 }

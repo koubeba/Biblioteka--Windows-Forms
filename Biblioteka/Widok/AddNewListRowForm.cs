@@ -78,5 +78,17 @@ namespace Biblioteka
         {
             this.dataTable.AddValueRowFromString(textBoxes.Select(o => o.Value.Text).ToArray());
         }
+
+        private void InitializeComponent()
+        {
+            this.SuspendLayout();
+            // 
+            // AddNewListRowForm
+            // 
+            this.ClientSize = new System.Drawing.Size(282, 253);
+            this.Name = "AddNewListRowForm";
+            this.ResumeLayout(false);
+
+        }
     }
 }

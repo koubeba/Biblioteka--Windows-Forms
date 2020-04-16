@@ -11,15 +11,17 @@ namespace Biblioteka.Widok
     class ListItemContextMenu: ContextMenuStrip
     {
         private ListViewItem item;
+        private int index;
 
-        public delegate void RowEditedDelegate(object sender, ListViewItem item);
+        public delegate void RowEditedDelegate(object sender, ListViewItem item, int index);
         public RowEditedDelegate RowEditedEvent;
 
-        public delegate void RowDeletedDelegate(object sender, ListViewItem item);
+        public delegate void RowDeletedDelegate(object sender, ListViewItem item, int index);
         public RowDeletedDelegate RowDeletedEvent;
-        public ListItemContextMenu(ListViewItem item)
+        public ListItemContextMenu(ListViewItem item, int index)
         {
             this.item = item;
+            this.index = index;
 
             ToolStripMenuItem editItem = new ToolStripMenuItem("Edytuj");
             editItem.Click += EditItem_Click;
@@ -33,12 +35,12 @@ namespace Biblioteka.Widok
 
         private void EditItem_Click(object sender, EventArgs e)
         {
-            RowEditedEvent?.Invoke(this, item);
+            RowEditedEvent?.Invoke(this, item, index);
         }
 
         private void DeleteItem_Click(object sender, EventArgs e)
         {
-            RowDeletedEvent?.Invoke(this, item);
+            RowDeletedEvent?.Invoke(this, item, index);
         }
     }
 }

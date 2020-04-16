@@ -1,20 +1,55 @@
 ﻿using System;
+using System.Linq;
+using System.Runtime.Remoting.Channels;
 using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
+using Biblioteka.Model.Filter;
 using Biblioteka.Widok;
 
 namespace Biblioteka
 {
     class ListForm : Form
     {
-        private readonly DataTable dataTable;
+        public DataTable dataTable { get; }
         private readonly ToolStripStatusLabel statusStrip;
-        private readonly ListView list = new ListView();
+        private readonly MenuStrip menuStrip; 
 
-        public ListForm(DataTable dataTable, ToolStripStatusLabel statusStrip)
+        public MenuStrip FilterMenuStrip;
+        private readonly ListView list = new ListView();
+        public FilterRule FilterRule { get; set; }
+
+        public ListForm(DataTable dataTable, ToolStripStatusLabel statusStrip, MenuStrip menuStrip)
         {
             this.dataTable = dataTable;
             Text = this.dataTable.Name;
+            this.menuStrip = menuStrip;
+            
+            FilterMenuStrip = new MenuStrip();
+            FilterMenuStrip.AllowMerge = true;
+
+            FilterRule = new FilterRule(dataTable.AttributeRow);
+            FilterRule.AddPartialRule("Imię", new AttributePartialRule(
+                (value => value.ToString().First().Equals('U'))
+                ));
+
+            ToolStripMenuItem filterMenuItem = new ToolStripMenuItem("Filtruj");
+            filterMenuItem.Click += (object sender, EventArgs e) =>
+            {
+                FilterForm newFilterForm = new FilterForm(this);
+                newFilterForm.MdiParent = MdiParent;
+                newFilterForm.Load();
+                newFilterForm.Show();
+
+            };
+            ToolStripMenuItem unfilterMenuItem = new ToolStripMenuItem("Usuń filtr");
+            unfilterMenuItem.Click += (sender, args) =>
+            {
+                FilterRule = null;
+                InitializeListViewItems();
+            };
+
+            FilterMenuStrip.Items.Add(filterMenuItem);
+            FilterMenuStrip.Items.Add(unfilterMenuItem);
 
             this.statusStrip = statusStrip;
 
@@ -27,7 +62,7 @@ namespace Biblioteka
             this.dataTable.RowEditedEvent += DataTable_RowEditedEvent;
 
             // Dodaj elementy kolekcji do listy
-            this.initializeListViewItems();
+            this.InitializeListViewItems();
             // Ustaw widok listy na wypełniający całe okno
             list.SetBounds(0, 0, this.Size.Width, this.Size.Height);
 
@@ -36,6 +71,19 @@ namespace Biblioteka
 
             this.FormClosing += ListForm_FormClosing;
             list.GotFocus += List_GotFocus;
+
+            this.Activated += ListForm_Activated;
+            this.Deactivate += ListForm_Deactivate;
+        }
+
+        private void ListForm_Deactivate(object sender, EventArgs e)
+        {
+            ToolStripManager.RevertMerge(menuStrip, this.FilterMenuStrip);
+        }
+
+        private void ListForm_Activated(object sender, EventArgs e)
+        {
+            ToolStripManager.Merge( this.FilterMenuStrip, menuStrip);
         }
 
         private void List_GotFocus(object sender, EventArgs e)
@@ -52,12 +100,14 @@ namespace Biblioteka
             }
         }
 
-        private void initializeListViewItems()
+        private void InitializeListViewItems()
         {
-            int index = 1;
+            this.list.Items.Clear();
+            int index = 0;
             foreach (AttributeValueRow row in this.dataTable.AttributeValueRows)
             {
-                this.list.Items.Add(generateListViewItemForRow(row, index++));
+                FilterOneRow(index);
+                index++;
             }
 
             // Dodaj kolumny do widoku listy
@@ -84,7 +134,7 @@ namespace Biblioteka
             {
                 if (list.FocusedItem.Bounds.Contains(e.Location))
                 {
-                    ListItemContextMenu menu = new ListItemContextMenu(list.FocusedItem);
+                    ListItemContextMenu menu = new ListItemContextMenu(list.FocusedItem, int.Parse(list.FocusedItem.Text));
                     menu.RowEditedEvent += RowEditedEvent;
                     menu.RowDeletedEvent += RowDeletedEvent;
                     menu.Show(Cursor.Position);
@@ -92,46 +142,61 @@ namespace Biblioteka
             }
         }
 
-        private void RowDeletedEvent(object sender, ListViewItem item)
+        private void FilterOneRow(int rowIndex)
         {
-            dataTable.DeleteValueRow(item.Index);
+            AttributeValueRow rowToAdd = dataTable.AttributeValueRows[rowIndex];
+            if (FilterRule != null && !FilterRule.Filter(rowToAdd)) return; 
+            addNewListViewItem(dataTable.AttributeValueRows[rowIndex], rowIndex);
         }
 
-        private void RowEditedEvent(object sender, ListViewItem item)
+        private void RowDeletedEvent(object sender, ListViewItem item, int index)
         {
-            EditListRowForm editForm = new EditListRowForm(dataTable, item.Index);
+            dataTable.DeleteValueRow(index);
+        }
+
+        private void RowEditedEvent(object sender, ListViewItem item, int index)
+        {
+            EditListRowForm editForm = new EditListRowForm(dataTable, index);
             editForm.Load();
             editForm.MdiParent = this.MdiParent;
             editForm.Show();
         }
 
-        private void addNewListViewItem(AttributeValueRow newRow)
+        private void addNewListViewItem(AttributeValueRow newRow, int index)
         {
-            this.list.Items.Add(generateListViewItemForRow(newRow, this.list.Items.Count+1));
+            if (FilterRule != null && !FilterRule.Filter(newRow)) return;
+            this.list.Items.Add(generateListViewItemForRow(newRow, index));
         }
 
         private void LibraryData_NewRowAddedEvent(object sender, AttributeValueRow newRow)
         {
-            this.addNewListViewItem(newRow);
+            this.addNewListViewItem(newRow, this.dataTable.AttributeValueRows.Count-1);
             UpdateToolstripStatus();
         }
 
         private void DataTableOnRowDeletedEvent(object sender, int deletedrowindex)
         {
             list.Items.RemoveAt(deletedrowindex);
+            InitializeListViewItems();
             UpdateToolstripStatus();
         }
 
         private void DataTable_RowEditedEvent(object sender, int editedRowIndex)
         {
-            list.Items.RemoveAt(editedRowIndex);
-            list.Items.Insert(editedRowIndex,
-                generateListViewItemForRow(dataTable.AttributeValueRows[editedRowIndex], editedRowIndex + 1));
+            InitializeListViewItems();
+            UpdateToolstripStatus();
         }
 
         private void UpdateToolstripStatus()
+        { 
+            statusStrip.Text = "Liczba elementów: " + this.list.Items.Count.ToString();
+        }
+
+        public void ApplyFilter(FilterRule rule)
         {
-            statusStrip.Text = "Liczba elementów: " + dataTable.AttributeValueRows.Count.ToString();
+            FilterRule = rule;
+            InitializeListViewItems();
+            UpdateToolstripStatus();
         }
     }
 }
